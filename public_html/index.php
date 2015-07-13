@@ -115,7 +115,7 @@
 						<thead>
 							<tr>
 								<th>Round #</th>
-								<th ng-repeat="player in Players">{{player.name}} <small>(Current Phase: {{player.phases[round]}})</small></th>
+								<th ng-repeat="player in Players">{{player.name}} <small>(Current Phase: {{player.phases[round]}} / Total Score: {{player.totalScore()}})</small></th>
 							</tr>
 						</thead>
 						<tbody>
