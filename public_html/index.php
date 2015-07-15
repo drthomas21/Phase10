@@ -28,69 +28,73 @@
 					<p>&nbsp;</p>
 				</section>
 				<section class="col-lg-12" ng-show="Players.length > 1">
-					<table class="table table-bordered" >
-						<thead>
-							<tr>
-								<th>Round #</th>
-								<th ng-repeat="player in Players">{{player.name}}</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr>
-								<td>{{round+1}}</td>
-								<td ng-repeat="player in Players">
-									<div class="form-group">
-										<input type="checkbox" id="summary-player-phase-{{$index}}" ng-model="player.completed"/> <label for="summary-player-phase-{{$index}}">Completed Phase</label>
-									</div>
-									<div class="form-group">
-										<label for="summary-player-score-{{$index}}">Score</label>
-										<input id="summary-player-score-{{$index}}" type="text" ng-model="player.scores[round]" placeholder="score">
-									</div>								
-								</td>
-							</tr>
-						</tbody>
-					</table>
+					<section style="overflow-x: scroll">
+						<table class="table table-bordered" >
+							<thead>
+								<tr>
+									<th>Round #</th>
+									<th ng-repeat="player in Players">{{player.name}}</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>{{round+1}}</td>
+									<td ng-repeat="player in Players">
+										<div class="form-group">
+											<input type="checkbox" id="summary-player-phase-{{$index}}" ng-model="player.completed"/> <label for="summary-player-phase-{{$index}}">Completed Phase</label>
+										</div>
+										<div class="form-group">
+											<label for="summary-player-score-{{$index}}">Score</label>
+											<input id="summary-player-score-{{$index}}" type="text" ng-model="player.scores[round]" placeholder="score">
+										</div>								
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</section>
 					<button class="btn btn-success" ng-click="nextRound()">Next Round</button>
 				</section>
 			</div>
 		</tab>
 		<tab heading="Scores" ng-show="Players.length > 1" class="score">
-			<table class="table table-bordered">
-				<thead>
-					<tr>
-						<th>Round #</th>
-						<th ng-repeat="player in Players">{{player.name}} <small>(Current Phase: {{player.phase()}} / Total Score: {{player.totalScore()}})</small></th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr ng-repeat="row in list()">
-						<td>{{$index + 1}} 
-							<button ng-click="editThisRound($index)" ng-show="!isEditing"><span class="glyphicon glyphicon-edit"></span></button>
-						</td>
-						<td ng-repeat="player in Players">
-							<span ng-show="!isEditing || (isEditing && editRound != row)">
-								<strong>Phase: </strong>{{player.phase(row)}} <strong>Score: </strong>{{player.scores[row]}}
-							</span>
-							<span ng-show="isEditing && editRound == row">
-								<input type="checkbox" id="edit-player-phase-{{$index}}-{{row}}" ng-model="player.phases[row]" ng-true-value="1" ng-false-value="0"/> <label for="edit-player-phase-{{$index}}-{{row}}">Completed Phase</label><br />
-								<label for="edit-player-score-{{$index}}-{{row}}">Score:</label><input id="edit-player-score-{{$index}}-{{row}}" type="number" ng-model="player.scores[row]" placeholder="score"></span>
-							</span>
-						</td>
-					</tr>
-					<tr ng-show="!isEditing">
-						<td>{{round+1}}</td>
-						<td ng-repeat="player in Players">
-							<div class="form-group">
-								<input type="checkbox" id="player-phase-{{$index}}" ng-model="player.phases[round]" ng-true-value="1" ng-false-value="0"/> <label for="player-phase-{{$index}}">Completed Phase</label>
-							</div>
-							<div class="form-group">
-								<label for="player-score-{{$index}}">Score</label>
-								<input id="player-score-{{$index}}" type="number" ng-model="player.scores[round]" placeholder="score">
-							</div>								
-						</td>
-					</tr>
-				</tbody>
-			</table>
+			<section style="overflow-x: scroll">
+				<table class="table table-bordered">
+					<thead>
+						<tr>
+							<th>Round #</th>
+							<th ng-repeat="player in Players">{{player.name}} <small>(Current Phase: {{player.phase()}} / Total Score: {{player.totalScore()}})</small></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="row in list()">
+							<td>{{$index + 1}} 
+								<button ng-click="editThisRound($index)" ng-show="!isEditing"><span class="glyphicon glyphicon-edit"></span></button>
+							</td>
+							<td ng-repeat="player in Players">
+								<span ng-show="!isEditing || (isEditing && editRound != row)">
+									<strong>Phase: </strong>{{player.phase(row)}} <strong>Score: </strong>{{player.scores[row]}}
+								</span>
+								<span ng-show="isEditing && editRound == row">
+									<input type="checkbox" id="edit-player-phase-{{$index}}-{{row}}" ng-model="player.phases[row]" ng-true-value="1" ng-false-value="0"/> <label for="edit-player-phase-{{$index}}-{{row}}">Completed Phase</label><br />
+									<label for="edit-player-score-{{$index}}-{{row}}">Score:</label><input id="edit-player-score-{{$index}}-{{row}}" type="number" ng-model="player.scores[row]" placeholder="score"></span>
+								</span>
+							</td>
+						</tr>
+						<tr ng-show="!isEditing">
+							<td>{{round+1}}</td>
+							<td ng-repeat="player in Players">
+								<div class="form-group">
+									<input type="checkbox" id="player-phase-{{$index}}" ng-model="player.phases[round]" ng-true-value="1" ng-false-value="0"/> <label for="player-phase-{{$index}}">Completed Phase</label>
+								</div>
+								<div class="form-group">
+									<label for="player-score-{{$index}}">Score</label>
+									<input id="player-score-{{$index}}" type="number" ng-model="player.scores[round]" placeholder="score">
+								</div>								
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</section>
 			<button class="btn btn-success" ng-click="nextRound()" ng-show="!isEditing">Next Round</button>
 			<button class="btn btn-primary" ng-click="endRoundEditing()" ng-hide="!isEditing">Edit Round</button>
 		</tab>

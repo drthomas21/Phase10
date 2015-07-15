@@ -22,7 +22,12 @@ var Player = function() {
 		}
 		var sum = 1;
 		for(var i = 0; i < num; i++) {
-			sum += parseInt(that.phases[i]);
+			var val = parseInt(that.phases[i]);
+			if(!val) {
+				val = 0;
+				that.phases[i] = 0;
+			}
+			sum += val;
 		}
 		
 		return sum;
