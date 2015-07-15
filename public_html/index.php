@@ -98,7 +98,7 @@
 			<button class="btn btn-success" ng-click="nextRound()" ng-show="!isEditing">Next Round</button>
 			<button class="btn btn-primary" ng-click="endRoundEditing()" ng-hide="!isEditing">Edit Round</button>
 		</tab>
-		<tab heading="Rules">
+		<tab heading="Standard Rules">
 			<h2>Players</h2>
 			<hr />
 			<p>This game was designed for 2 to 6 players</p>
