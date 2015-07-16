@@ -35,13 +35,22 @@ var Player = function() {
 	var that = this;
 };
 
+var Instance = null;
+
 var app = angular.module('phase10',['ngCookies','ngSanitize','ui.bootstrap'])
-.controller('GameCtrl',function($scope) {
+.controller('GameCtrl',function($scope,SessionService) {
 	$scope.newPlayers = ["","","","","",""];
 	$scope.Players = [];
 	$scope.round = 0;
 	$scope.isEditing = false;
 	$scope.editRound = 0;
+	
+	var saveData = function() {
+		SessionService.updateSession({
+			player: $scope.Players,
+			round: $scope.round
+		});
+	};
 	
 	$scope.list = function() {
 		var list = [];
@@ -103,6 +112,7 @@ var app = angular.module('phase10',['ngCookies','ngSanitize','ui.bootstrap'])
 		}
 		
 		$scope.isEditing = false;
+		saveData();
 	};
 	
 	$scope.nextRound = function() {		
@@ -121,5 +131,50 @@ var app = angular.module('phase10',['ngCookies','ngSanitize','ui.bootstrap'])
 		}
 		
 		$scope.round++;
+		saveData();
 	};
-});
+	
+	var init = function() {
+		SessionService.getSession(function(data) {
+			$scope.Players = [];
+			for(var i = 0; i < data.player.length; i++) {
+				var _player = new Player();
+				_player.name = data.player[i].name;
+				_player.scores = data.player[i].scores;
+				_player.phases = data.player[i].phases;
+				$scope.Players.push(_player);
+			}
+			
+			$scope.round = data.round;
+			if(!$scope.$$phase) {
+				$scope.$apply();
+			}
+		});
+	}
+	init();
+})
+.factory("SessionService",['$http',function($http) {
+	if(Instance == null) {
+		var SessionService = function() {
+			var apiUrl = "http://"+window.location.host+"/ajax.php";
+			var sessionID = window.location.pathname.replace("/","");
+			
+			this.updateSession = function(Players) {
+				$http.put(apiUrl, JSON.stringify({data: Players,sessionID:sessionID}));
+			};
+			
+			this.getSession = function(callback) {
+				$http.get(apiUrl+"?sessionID="+sessionID)
+				.success(function(data) {
+					if(typeof(callback) == "function") {
+						callback(data);
+					}
+				});
+			}
+			
+		}
+		Instance = new SessionService();
+	}
+	
+	return Instance;
+}]);

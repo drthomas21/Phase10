@@ -1,4 +1,8 @@
-<?php session_start(); ?>
+<?php require_once(__DIR__.'/classes/bootstrap.php');
+	$Database = $_GLOBALS['Database'];
+	$sessionID = $_GLOBALS['sessionID'];
+	$Database->close();
+?>
 <!DOCTYPE HTML>
 <html ng-app="phase10" ng-cloak>
 	<head>
