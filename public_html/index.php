@@ -41,11 +41,11 @@
 									<td>{{round+1}}</td>
 									<td ng-repeat="player in Players">
 										<div class="form-group">
-											<input type="checkbox" id="summary-player-phase-{{$index}}" ng-model="player.completed"/> <label for="summary-player-phase-{{$index}}">Completed Phase</label>
+											<input type="checkbox" id="summary-player-phase-{{$index}}" ng-model="player.phases[round]" ng-true-value="1" ng-false-value="0"/> <label for="summary-player-phase-{{$index}}">Completed Phase</label>
 										</div>
 										<div class="form-group">
 											<label for="summary-player-score-{{$index}}">Score</label>
-											<input id="summary-player-score-{{$index}}" type="text" ng-model="player.scores[round]" placeholder="score">
+											<input id="summary-player-score-{{$index}}" type="number" ng-model="player.scores[round]" placeholder="score">
 										</div>								
 									</td>
 								</tr>
