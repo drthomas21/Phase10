@@ -151,6 +151,9 @@ var app = angular.module('phase10',['ngCookies','ngSanitize','ui.bootstrap','ngR
 			SessionService.setSessionID($scope.sessionId);
 			init();
 			$scope.loadingSession = false;
+			if(typeof(ga) == "function") {
+				ga('send', 'pageview');
+			}
 		}
 	};
 	
