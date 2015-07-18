@@ -101,7 +101,7 @@
 		        <span class="icon-bar"></span>
 		        <span class="icon-bar"></span>
 		      </button>
-		      <a class="navbar-brand" href="/">Phase 10 Scoreboard</a>
+		      <a class="navbar-brand" href="/" target="_self">Phase 10 Scoreboard</a>
 		    </div>
 		
 		    <!-- Collect the nav links, forms, and other content for toggling -->
