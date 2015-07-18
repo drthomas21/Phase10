@@ -37,13 +37,21 @@ var Player = function() {
 
 var Instance = null;
 
-var app = angular.module('phase10',['ngCookies','ngSanitize','ui.bootstrap'])
+var app = angular.module('phase10',['ngCookies','ngSanitize','ui.bootstrap','ngRoute'])
+.config(['$routeProvider','$locationProvider',function($routeProvider,$locationProvider){
+	$locationProvider.html5Mode({enabled: true,requireBase: false}).hashPrefix('!');
+	$routeProvider.otherwise({
+		redirectTo: '/'
+	});
+}])
 .controller('GameCtrl',function($scope,SessionService) {
 	$scope.newPlayers = ["","","","","",""];
 	$scope.Players = [];
 	$scope.round = 0;
 	$scope.isEditing = false;
+	$scope.loadingSession = false;
 	$scope.editRound = 0;
+	$scope.sessionId = "";
 	
 	var saveData = function() {
 		SessionService.updateSession({
@@ -134,26 +142,50 @@ var app = angular.module('phase10',['ngCookies','ngSanitize','ui.bootstrap'])
 		saveData();
 	};
 	
+	$scope.startLoadSession = function() {
+		$scope.loadingSession = true;
+	};
+	
+	$scope.loadSession = function() {
+		if($scope.sessionId.trim() != "") {
+			SessionService.setSessionID($scope.sessionId);
+			init();
+			$scope.loadingSession = false;
+		}
+	};
+	
+	$scope.cancelLoadSession = function() {
+		$scope.loadingSession = false;
+	};
+	
+	$scope.shareSession = function() {
+		FB.ui({
+		  method: 'send',
+		  link: window.location.href,
+		});
+	};
+	
 	var init = function() {
 		SessionService.getSession(function(data) {
 			$scope.Players = [];
-			for(var i = 0; i < data.player.length; i++) {
-				var _player = new Player();
-				_player.name = data.player[i].name;
-				_player.scores = data.player[i].scores;
-				_player.phases = data.player[i].phases;
-				$scope.Players.push(_player);
-			}
-			
-			$scope.round = data.round;
-			if(!$scope.$$phase) {
-				$scope.$apply();
+			if(typeof(data) != "string") {
+				for(var i = 0; i < data.player.length; i++) {
+					var _player = new Player();
+					_player.name = data.player[i].name;
+					_player.scores = data.player[i].scores;
+					_player.phases = data.player[i].phases;
+					$scope.Players.push(_player);
+				}
+				
+				$scope.round = data.round;
 			}
 		});
 	}
+	
 	init();
+	$scope.sessionId = SessionService.getSessionID();
 })
-.factory("SessionService",['$http',function($http) {
+.factory("SessionService",['$http','$location','$rootScope',function($http,$location,$rootScope) {
 	if(Instance == null) {
 		var SessionService = function() {
 			var apiUrl = "http://"+window.location.host+"/ajax.php";
@@ -170,7 +202,17 @@ var app = angular.module('phase10',['ngCookies','ngSanitize','ui.bootstrap'])
 						callback(data);
 					}
 				});
-			}
+			};
+			
+			this.setSessionID = function(id) {
+				sessionID = id;
+				$location.url("/"+id);
+				$location.replace();
+			};
+			
+			this.getSessionID = function() {
+				return sessionID;
+			};
 			
 		}
 		Instance = new SessionService();
