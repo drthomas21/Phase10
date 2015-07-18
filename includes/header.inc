@@ -82,12 +82,13 @@
 				float: left;
 			}
 			
-			@media (max-width: 507px) {
-				div.fb-div {
-					float: left !important;
-					margin-top: 5px;
-				} 
-			}
+			@media (max-width: 400px) { 
+ 				div.session-buttons { 
+ 					float: left !important; 
+ 					margin-top: 5px; 
+ 					width: 100%;
+ 				}  
+ 			} 
 		</style>
 	</head>
 	<body>
@@ -115,16 +116,21 @@
 		
 		<div class="sub-nav">
 			<div class="col-xs-12">
-				<section ng-hide="loadingSession" style="display: inline-block">
-					<button class="btn btn-success" ng-click="startLoadSession()">Load Session</button> 
-					<button class="btn btn-primary" ng-click="shareSession()">Share Session</button>
-				</section>
-				<section ng-show="loadingSession" style="display: inline-block">
-					<input ng-model="sessionId" type="text" placeholder="Session ID"/>
-					<button class="btn btn-success" ng-click="loadSession()">Load Session</button>
-					<button class="btn btn-warning" ng-click="cancelLoadSession()">Cancel</button>
-				</section>
-				<div class="pull-right fb-div"><div  class="fb-like"  data-share="false"  data-width="200" data-show-faces="false"></div></div>
+				<div class="pull-left">
+					<div class="fb-like" data-layout="button_count" data-share="false"  data-width="200" data-show-faces="false"></div>
+				</div>
+				
+				<div class="pull-right session-buttons">
+					<section ng-hide="loadingSession" style="display: inline-block">
+						<button class="btn btn-success" ng-click="startLoadSession()">Load Session</button> 
+						<button class="btn btn-primary" ng-click="shareSession()">Share Session</button>
+					</section>
+					<section ng-show="loadingSession" style="display: inline-block">
+						<input ng-model="sessionId" type="text" placeholder="Session ID"/>
+						<button class="btn btn-success" ng-click="loadSession()">Load Session</button>
+						<button class="btn btn-warning" ng-click="cancelLoadSession()">Cancel</button>
+					</section>
+				</div>
 			</div>
 		</div>
-		<br />
+		<div class="clear"></div>
