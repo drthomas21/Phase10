@@ -278,7 +278,6 @@ var app = angular.module('phase10',['ngCookies','ngSanitize','ui.bootstrap','ngR
 			this.getSessions = function(callback) {
 				$http.get(apiUrl)
 				.success(function(data) {
-					console.log(data);
 					if(typeof(callback) == "function") {
 						callback(data);
 					}
