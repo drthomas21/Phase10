@@ -45,7 +45,7 @@
 										</div>
 										<div class="form-group">
 											<label for="summary-player-score-{{$index}}">Score</label>
-											<input id="summary-player-score-{{$index}}" type="number" ng-model="player.scores[round]" placeholder="score">
+											<input id="summary-player-score-{{$index}}" type="number" ng-model="player.scores[round]" placeholder="score" ng-click="player.scores[round] = ''">
 										</div>								
 									</td>
 								</tr>
@@ -88,7 +88,7 @@
 								</div>
 								<div class="form-group">
 									<label for="player-score-{{$index}}">Score</label>
-									<input id="player-score-{{$index}}" type="number" ng-model="player.scores[round]" placeholder="score">
+									<input id="player-score-{{$index}}" type="number" ng-model="player.scores[round]" placeholder="score" ng-click="player.scores[round] = ''">
 								</div>								
 							</td>
 						</tr>

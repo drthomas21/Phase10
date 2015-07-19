@@ -9,7 +9,7 @@ var Player = function() {
 			var val = parseInt(that.scores[i]);
 			if(!val) {
 				val = 0;
-				that.scores[i] = 0;
+				//that.scores[i] = 0;
 			}
 			sum += val 
 		}
