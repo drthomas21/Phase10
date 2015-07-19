@@ -34,7 +34,6 @@ var Player = function() {
 	}
 	var that = this;
 };
-
 var Instance = null;
 
 var app = angular.module('phase10',['ngCookies','ngSanitize','ui.bootstrap','ngRoute'])
@@ -45,20 +44,32 @@ var app = angular.module('phase10',['ngCookies','ngSanitize','ui.bootstrap','ngR
 	});
 }])
 .controller('GameCtrl',function($scope,SessionService) {
+	var session = {};
+	$scope.sessions = [];
 	$scope.newPlayers = ["","","","","",""];
 	$scope.Players = [];
 	$scope.round = 0;
 	$scope.isEditing = false;
 	$scope.loadingSession = false;
 	$scope.editRound = 0;
+	
 	$scope.sessionId = "";
+	$scope.loadSessionId = "";
+	$scope.password = "";
+	$scope.name = "";
 	
 	var saveData = function() {
 		SessionService.updateSession({
 			player: $scope.Players,
 			round: $scope.round
-		});
+		}, $scope.password, $scope.name);
 	};
+	
+	$scope.saveData = function(password,name) {
+		$scope.password = password;
+		$scope.name = name;
+		saveData();
+	}
 	
 	$scope.list = function() {
 		var list = [];
@@ -146,18 +157,46 @@ var app = angular.module('phase10',['ngCookies','ngSanitize','ui.bootstrap','ngR
 		$scope.loadingSession = true;
 	};
 	
+	$scope.loadNewSession = function(session) {
+		angular.element(window).scrollTop(0);
+		$scope.loadSessionId = session.session_id;
+		$scope.startLoadSession();
+	};
+	
 	$scope.loadSession = function() {
 		if($scope.sessionId.trim() != "") {
-			SessionService.setSessionID($scope.sessionId);
-			init();
-			$scope.loadingSession = false;
-			if(typeof(ga) == "function") {
-				ga('send', 'pageview');
-			}
+			SessionService.getNewSession($scope.loadSessionId,$scope.password,function(data) {
+				if(typeof(data) != "string") {
+					SessionService.setSessionID($scope.loadSessionId);
+					$scope.sessionId = SessionService.getSessionID();
+
+					$scope.Players = [];
+					if(typeof(data) != "string") {
+						for(var i = 0; i < data.player.length; i++) {
+							var _player = new Player();
+							_player.name = data.player[i].name;
+							_player.scores = data.player[i].scores;
+							_player.phases = data.player[i].phases;
+							$scope.Players.push(_player);
+						}
+						
+						$scope.round = data.round;
+					}
+					
+					$scope.loadingSession = false;
+					if(typeof(ga) == "function") {
+						ga('send', 'pageview');
+					}
+				} else {
+					alert("Cannot load session. Invalid passcode or session does not exists");
+				}
+			});
+			
 		}
 	};
 	
 	$scope.cancelLoadSession = function() {
+		$scope.sessionId = SessionService.getSessionID();
 		$scope.loadingSession = false;
 	};
 	
@@ -169,7 +208,7 @@ var app = angular.module('phase10',['ngCookies','ngSanitize','ui.bootstrap','ngR
 	};
 	
 	var init = function() {
-		SessionService.getSession(function(data) {
+		SessionService.getSession($scope.password, function(data) {
 			$scope.Players = [];
 			if(typeof(data) != "string") {
 				for(var i = 0; i < data.player.length; i++) {
@@ -183,6 +222,10 @@ var app = angular.module('phase10',['ngCookies','ngSanitize','ui.bootstrap','ngR
 				$scope.round = data.round;
 			}
 		});
+		
+		SessionService.getSessions(function(data) {
+			$scope.sessions = data;
+		});
 	}
 	
 	init();
@@ -194,13 +237,48 @@ var app = angular.module('phase10',['ngCookies','ngSanitize','ui.bootstrap','ngR
 			var apiUrl = "http://"+window.location.host+"/ajax.php";
 			var sessionID = window.location.pathname.replace("/","");
 			
-			this.updateSession = function(Players) {
-				$http.put(apiUrl, JSON.stringify({data: Players,sessionID:sessionID}));
+			this.updateSession = function(Players,password, name) {
+				var session = {
+						data: Players,
+						sessionID: sessionID,
+						numOfPlayers: Players.player.length,
+						passcode: password,
+						name: name
+				};
+				$http.put(apiUrl, JSON.stringify(session));
 			};
 			
-			this.getSession = function(callback) {
-				$http.get(apiUrl+"?sessionID="+sessionID)
+			this.getSessions = function(callback) {
+				$http.get(apiUrl)
 				.success(function(data) {
+					if(typeof(callback) == "function") {
+						callback(data);
+					}
+				});
+			};
+			
+			this.getSession = function(passcode, callback) {
+				$http.get(apiUrl+"?sessionID="+sessionID+"&passcode="+passcode)
+				.success(function(data) {
+					if(typeof(callback) == "function") {
+						callback(data);
+					}
+				});
+			};
+			
+			this.getNewSession = function(sessID, passcode, callback) {
+				$http.get(apiUrl+"?sessionID="+sessID+"&passcode="+passcode)
+				.success(function(data) {
+					if(typeof(callback) == "function") {
+						callback(data);
+					}
+				});
+			};
+			
+			this.getSessions = function(callback) {
+				$http.get(apiUrl)
+				.success(function(data) {
+					console.log(data);
 					if(typeof(callback) == "function") {
 						callback(data);
 					}

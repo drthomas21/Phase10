@@ -57,12 +57,12 @@ class MysqlDriver {
 		return $this->error;
 	}
 	
-	public function getGameData($sessionID) {
+	public function getGameData($sessionID,$passcode) {
 		$sessionID = preg_replace("/[^a-zA-Z0-9]+/","",$sessionID);
 		
 		if(!empty($sessionID)) {
-			if($statement = $this->conn->prepare("SELECT data FROM ".self::TABLE_NAME." WHERE session_id=? LIMIT 0,1")) {
-				$statement->bind_param("s", $sessionID);
+			if($statement = $this->conn->prepare("SELECT data FROM ".self::TABLE_NAME." WHERE session_id=? AND password=? LIMIT 0,1")) {
+				$statement->bind_param("ss", $sessionID,strlen($passcode) > 0 ? sha1($passcode) : "");
 				$statement->execute();
 				$statement->bind_result($Data);
 				$statement->fetch();
@@ -81,14 +81,36 @@ class MysqlDriver {
 		}
 	}
 	
-	public function setGameData($sessionID,$data) {
+	public function getGameSessions() {
+		if($result = $this->conn->query("SELECT session_id, name, num_of_players , password FROM ".self::TABLE_NAME." LIMIT 0, 1000")) {
+			$arrData = array();
+			while($row = $result->fetch_assoc()){
+				$obj = new stdClass();
+				$obj->session_id = $row['session_id'];
+				$obj->name = $row['name'];
+				$obj->numOfPlayers = $row['num_of_players'];
+				$obj->hasPassword = strlen($row['password']) > 0;
+				$arrData[] = $obj;
+			}
+			$result->close();
+			return json_encode($arrData);
+		} else {
+			$this->error = $this->conn->error;
+			if(empty($this->error)) {
+				$this->error = "Failed to fetch from database";
+			}
+			return false;
+		}
+	}
+	
+	public function setGameData($sessionID,$data,$numOfPlayers,$password,$name) {
 		$sessionID = preg_replace("/[^a-zA-Z0-9]+/","",$sessionID);
 		
 		if(!empty($sessionID)) {
 			if($this->getGameData($sessionID)) {
 				//We need to update;
-				if($statement = $this->conn->prepare("UPDATE " . self::TABLE_NAME . " SET data=? WHERE session_id=?")) {
-					$statement->bind_param("ss",$data,$sessionID);
+				if($statement = $this->conn->prepare("UPDATE " . self::TABLE_NAME . " SET data=?, num_of_players=?, password=?, name=? WHERE session_id=?")) {
+					$statement->bind_param("sdsss",$data,$numOfPlayers,(strlen($password) > 0 ? sha1($password) : ""),$name,$sessionID);
 					$statement->execute();
 					$statement->close();
 				} else {
@@ -100,8 +122,8 @@ class MysqlDriver {
 				}
 			} else {
 				//We need to add
-				if($statement = $this->conn->prepare("INSERT INTO " . self::TABLE_NAME . " (session_id,data) VALUES ( ? , ? )")) {
-					$statement->bind_param("ss",$sessionID,$data);
+				if($statement = $this->conn->prepare("INSERT INTO " . self::TABLE_NAME . " (session_id,data,num_of_players,password,name) VALUES ( ? , ? , ? , ?, ?)")) {
+					$statement->bind_param("ssdss",$sessionID,$data,$numOfPlayers,$password,$name);
 					$statement->execute();
 					$statement->close();
 				} else {

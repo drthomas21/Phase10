@@ -98,6 +98,49 @@
 			<button class="btn btn-success" ng-click="nextRound()" ng-show="!isEditing">Next Round</button>
 			<button class="btn btn-primary" ng-click="endRoundEditing()" ng-hide="!isEditing">Edit Round</button>
 		</tab>
+		<tab heading="Manage Session">
+			<div class="col-lg-12">
+				<div class="col-lg-12">
+					<div class="col-lg-12">
+						<h2>Current Session</h2>
+						<form class="form-inline">
+							<div class="form-group">
+								<label for="password">Set Passcode:<small>(Optional)</small></label>
+								<input type="text" ng-model="password" id="password">
+							</div>
+							<div class="form-group">
+								<label for="name">Set Name:<small>(Optional)</small></label>
+								<input type="text" ng-model="name" id="name">
+							</div>
+							<div class="form-group text-right">
+								<button class="btn btn-success" ng-click="saveData(password,name)">Update Settings</button>
+							</div>
+						</form>
+					</div>
+				</div>				
+				<div class="clear"></div>
+				<hr />
+			</div>
+			<div class="col-lg-12">
+				<h2>Existing Sessions</h2>
+				<table class="table table-bordered">
+					<thead>
+						<tr>
+							<th class="text-center">Session Name</th>
+							<th class="text-center">Number of Players</th>
+							<th class="text-center">Is Private?</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="session in sessions" ng-show="session.session_id != sessionId">
+							<td><a ng-href="" ng-click="loadNewSession(session)">{{session.name.length > 0 ? session.name : session.session_id}}</a></td>
+							<td class="text-center">{{session.numOfPlayers}}</td>
+							<td class="text-center"><span ng-show="session.hasPassword" class="glyphicon glyphicon-lock"></span></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</tab>
 		<tab heading="Standard Rules">
 			<h2>Players</h2>
 			<hr />

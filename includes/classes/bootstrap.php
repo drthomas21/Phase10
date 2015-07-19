@@ -25,7 +25,6 @@ if(empty($sessionID)) {
 	if($_SERVER['REQUEST_URI'] != "/ajax.php") {
 		header("Location: ".createSession());
 	}
-	exit;
 }
 
 $config = parse_ini_file("../config/database.ini");

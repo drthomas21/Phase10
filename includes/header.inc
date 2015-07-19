@@ -113,7 +113,8 @@
 					<button class="btn btn-primary" ng-click="shareSession()">Share Session</button>
 				</section>
 				<section ng-show="loadingSession" style="display: inline-block">
-					<input ng-model="sessionId" type="text" placeholder="Session ID"/>
+					<input ng-model="loadSessionId" type="text" placeholder="Session ID"/>
+					<input ng-model="password" type="text" placeholder="Passcode" />
 					<button class="btn btn-success" ng-click="loadSession()">Load Session</button>
 					<button class="btn btn-warning" ng-click="cancelLoadSession()">Cancel</button>
 				</section>
