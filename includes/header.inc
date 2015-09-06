@@ -27,7 +27,12 @@
 		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular-cookies.min.js" defer></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js" defer></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.13.0/ui-bootstrap-tpls.min.js" defer></script>
+		<?php if($view): ?>
+		<script src="./js/appView.js" defer></script>
+		<?php else: ?>
 		<script src="./js/app.js" defer></script>
+		<?php endif; ?>
+		
 		
 		<script>
 		  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -100,6 +105,7 @@
 		    <!-- Collect the nav links, forms, and other content for toggling -->
 		    <div class="collapse navbar-collapse" id="navbar-collapse">
 		      <ul class="nav navbar-nav">
+		      	<li><a href="/view.php" target="_self">Follow Game</a></li>
 		        <li><a href="https://github.com/drthomas21/Phase10" target="_blank">Github Project</a></li>
 		      </ul>
 		    </div><!-- /.navbar-collapse -->

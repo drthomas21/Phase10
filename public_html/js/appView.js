@@ -38,12 +38,6 @@ var StreamingInstance = null;
 var SessionInstance = null;
 
 var app = angular.module('phase10',['ngCookies','ngSanitize','ui.bootstrap','ngRoute'])
-.config(['$routeProvider','$locationProvider',function($routeProvider,$locationProvider){
-	$locationProvider.html5Mode({enabled: true,requireBase: false}).hashPrefix('!');
-	$routeProvider.otherwise({
-		redirectTo: '/'
-	});
-}])
 .controller('GameCtrl',function($scope,SessionService,StreamingService) {
 	var session = {};
 	$scope.sessions = [];
@@ -59,17 +53,26 @@ var app = angular.module('phase10',['ngCookies','ngSanitize','ui.bootstrap','ngR
 	$scope.password = "";
 	$scope.name = "";
 	
-	var saveData = function() {
-		SessionService.updateSession({
-			player: $scope.Players,
-			round: $scope.round
-		}, $scope.password, $scope.name);
-	};
-	
-	$scope.saveData = function(password,name) {
-		$scope.password = password;
-		$scope.name = name;
-		saveData();
+	var streamGame = function() {
+		StreamingService.streamSession($scope.sessionId,$scope.password,function(data) {
+			if(typeof(data) != "string") {
+				$scope.round = data.round;
+				for(var i = 0; i < $scope.Players.length; i++) {
+					for(var j = 0; j < data.player.length; j++) {
+						if($scope.Players[i].name == data.player[j].name) {
+							for(var k = 0; k < data.player[j].scores.length; k++) {
+								$scope.Players[i].scores[k] = data.player[j].scores[k];
+							}
+							for(var k = 0; k < data.player[j].phases.length; k++) {
+								$scope.Players[i].phases[k] = data.player[j].phases[k];
+							}
+						}
+					}
+				}
+			}
+			
+			$scope.$apply();
+		});
 	};
 	
 	$scope.list = function() {
@@ -132,7 +135,6 @@ var app = angular.module('phase10',['ngCookies','ngSanitize','ui.bootstrap','ngR
 		}
 		
 		$scope.isEditing = false;
-		saveData();
 	};
 	
 	$scope.nextRound = function() {		
@@ -151,7 +153,6 @@ var app = angular.module('phase10',['ngCookies','ngSanitize','ui.bootstrap','ngR
 		}
 		
 		$scope.round++;
-		saveData();
 	};
 	
 	$scope.startLoadSession = function() {
@@ -165,7 +166,7 @@ var app = angular.module('phase10',['ngCookies','ngSanitize','ui.bootstrap','ngR
 	};
 	
 	$scope.loadSession = function() {
-		if($scope.sessionId.trim() != "") {
+		if($scope.loadSessionId.trim() != "") {
 			SessionService.getNewSession($scope.loadSessionId,$scope.password,function(data) {
 				if(typeof(data) != "string") {
 					SessionService.setSessionID($scope.loadSessionId);
@@ -188,6 +189,7 @@ var app = angular.module('phase10',['ngCookies','ngSanitize','ui.bootstrap','ngR
 					if(typeof(ga) == "function") {
 						ga('send', 'pageview');
 					}
+					streamGame();
 				} else {
 					alert("Cannot load session. Invalid passcode or session does not exists");
 				}
@@ -232,11 +234,11 @@ var app = angular.module('phase10',['ngCookies','ngSanitize','ui.bootstrap','ngR
 	init();
 	$scope.sessionId = SessionService.getSessionID();
 })
-.factory("SessionService",['$http','$location','$rootScope',function($http,$location,$rootScope) {
+.factory("SessionService",['$http','$rootScope',function($http,$rootScope) {
 	if(SessionInstance == null) {
 		var SessionService = function() {
 			var apiUrl = "http://"+window.location.host+"/ajax.php";
-			var sessionID = window.location.pathname.replace("/","");
+			var sessionID = "";
 			
 			this.updateSession = function(Players,password, name) {
 				var session = {
@@ -287,8 +289,6 @@ var app = angular.module('phase10',['ngCookies','ngSanitize','ui.bootstrap','ngR
 			
 			this.setSessionID = function(id) {
 				sessionID = id;
-				$location.url("/"+id);
-				$location.replace();
 			};
 			
 			this.getSessionID = function() {
@@ -300,4 +300,43 @@ var app = angular.module('phase10',['ngCookies','ngSanitize','ui.bootstrap','ngR
 	}
 	
 	return SessionInstance;
+}])
+.factory("StreamingService",['$rootScope',function($rootScope) {
+	if(StreamingInstance == null) {
+		var StreamingService = function() {
+			var stream = null;
+			var apiUrl = "http://"+window.location.host+"/streaming.php";
+			var sessionID = "";
+			var passcode = "";
+			var callback = null;
+			
+			var init = function() {				
+				if(typeof(EventSource) == "function") {
+					stream = new EventSource(apiUrl+"?sessionID="+sessionID+"&passcode="+passcode)
+					stream.onmessage = function(resp) {
+						callback(JSON.parse(resp.data));
+					};
+				}
+			};
+			
+			this.reset = function() {
+				if(stream != null) {
+					stream.close();
+				}
+				init();				
+			};
+			
+			this.streamSession = function(session, pass, call) {
+				sessionID = session;
+				passcode = pass;
+				callback = call;
+				that.reset();
+			};
+			
+			var that = this;
+		};
+		StreamingInstance = new StreamingService();
+	}
+	
+	return StreamingInstance;
 }]);

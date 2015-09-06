@@ -7,7 +7,7 @@ function createSession() {
 }
 
 $sessionID = false;
-if(preg_replace("/\?.*/","",$_SERVER['REQUEST_URI']) == "/ajax.php") {
+if(preg_replace("/\?.*/","",$_SERVER['REQUEST_URI']) == "/ajax.php" || preg_replace("/\?.*/","",$_SERVER['REQUEST_URI']) == "/streaming.php") {
 	if($_SERVER['REQUEST_METHOD'] == "PUT") {
 		$_PUT = (array)json_decode(file_get_contents("php://input"));
 		$_GLOBALS['_PUT'] = $_PUT;
@@ -18,7 +18,7 @@ if(preg_replace("/\?.*/","",$_SERVER['REQUEST_URI']) == "/ajax.php") {
 		$sessionID = $_GET['sessionID'];
 	}
 } else {
-	$sessionID = trim(str_replace("ajax.php","",$_SERVER['REQUEST_URI']),"/");
+	$sessionID = trim(preg_replace("/(ajax|streaming)\.php/","",$_SERVER['REQUEST_URI']),"/");
 }
 
 if(empty($sessionID)) {	

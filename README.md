@@ -3,6 +3,9 @@
 This webapp is a tool used to track your scores when you are playing Phase 10. The app is in beta mode. So new features will be added
 
 ## Changelog
+### v3
+- Feature: adding ability for users to follow active session
+
 ### v2
 - Bug: fix layout issues with session and fb buttons on smaller screens
 - Bug: adding patch for anchor tags
