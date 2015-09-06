@@ -44,7 +44,7 @@ var app = angular.module('phase10',['ngCookies','ngSanitize','ui.bootstrap','ngR
 		redirectTo: '/'
 	});
 }])
-.controller('GameCtrl',function($scope,SessionService,StreamingService) {
+.controller('GameCtrl',function($scope,SessionService) {
 	var session = {};
 	$scope.sessions = [];
 	$scope.newPlayers = ["","","","","",""];

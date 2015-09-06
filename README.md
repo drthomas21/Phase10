@@ -4,6 +4,7 @@ This webapp is a tool used to track your scores when you are playing Phase 10. T
 
 ## Changelog
 ### v4
+- Bug: Fix JS issue with app.js
 - Feature: adding ability for users to follow active session
 
 ### v3
